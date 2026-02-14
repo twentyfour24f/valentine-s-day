@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Para ti ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Estilos generales y fondo */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* Degradado en lugar de color plano */
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            overflow: hidden; /* Importante para que los corazones no creen scroll */
+        }
+
+        /* La "tarjeta" central */
+        .container {
+            text-align: center;
+            position: relative;
+            background: rgba(255, 255, 255, 0.9); /* Blanco semitransparente */
+            padding: 40px 30px;
+            border-radius: 25px; /* Bordes muy redondeados */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Sombra suave para dar profundidad */
+            width: 90%;
+            max-width: 400px;
+            z-index: 10; /* Asegura que esté por encima de los corazones de fondo */
+        }
+
+        h1 {
+            color: #d81b60;
+            font-family: 'Fredoka One', cursive; /* Fuente gordita */
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .gif-container img {
+            width: 100%;
+            max-width: 250px;
+            border-radius: 20px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        /* Estilos mejorados para los botones */
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.3rem;
+            font-family: 'Fredoka One', cursive;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* Sombra 3D */
+        }
+
+        #yesBtn {
+            background: linear-gradient(to bottom, #4CAF50, #45a049);
+            color: white;
+        }
+
+        #yesBtn:active {
+             transform: scale(0.95); /* Efecto de clic */
+        }
+
+        #noBtn {
+            background: linear-gradient(to bottom, #f44336, #d32f2f);
+            color: white;
+            position: absolute;
+            z-index: 20; /* Asegura que el botón NO esté siempre arriba */
+        }
+
+        .hidden {
+            display: none;
+        }
+        
+        /* --- ANIMACIÓN DE CORAZONES FLOTANTES (Fondo) --- */
+        .bg_heart {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            top: -50%;
+            -webkit-transform: rotate(-45deg);
+            -moz-transform: rotate(-45deg);
+            -m-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+        }
+
+        .heart:before {
+            position: absolute;
+            top: -50%;
+            left: 0;
+            display: block;
+            content: "";
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            border-radius: 100%;
+        }
+
+        .heart:after {
+            position: absolute;
+            top: 0;
+            right: -50%;
+            display: block;
+            content: "";
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            border-radius: 100%;
+        }
+
+        @keyframes love {
+          0%{top:110%}
+          100%{top:-10%}
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg_heart">
+      </div>
+
+    <div class="container">
+        <div id="question-screen">
+            <div class="gif-container">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnJvZnB4bHlzM3JpbGltYm81Z3dvM3F4ZXZ4cnF2bzl4ZHV4d210ZCZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/cLS1cfxvGOPVpf9g3y/giphy.gif" alt="Cute Bear">
+            </div>
+            
+            <h1>¿Quieres ser mi San Valentín?</h1>
+            
+            <button class="btn" id="yesBtn" onclick="acceptProposal()">¡Sí, obvio!</button>
+            <button class="btn" id="noBtn" onmouseover="moveButton()" ontouchstart="moveButton()">No</button>
+        </div>
+
+        <div id="success-screen" class="hidden">
+            <div class="gif-container">
+                <img src="nosotros.gif" alt="Happy Hug">
+            </div>
+            <h1>¡Sabía que dirías que sí! ❤️</h1>
+            <p style="color: #d81b60; font-size: 1.3rem; font-weight: bold;">Te amo mi negrita.</p>
+        </div>
+    </div>
+
+    <script>
+        // Lógica para mover el botón (optimizada para que no se salga de la tarjeta)
+        function moveButton() {
+            var container = document.querySelector('.container');
+            var btn = document.getElementById('noBtn');
+            
+            // Calculamos los límites dentro de la tarjeta blanca
+            var containerRect = container.getBoundingClientRect();
+            var btnRect = btn.getBoundingClientRect();
+
+            // Margen de seguridad para que no quede pegado al borde
+            var margin = 20; 
+
+            var maxX = containerRect.width - btnRect.width - margin;
+            var maxY = containerRect.height - btnRect.height - margin;
+
+            var x = Math.random() * maxX;
+            var y = Math.random() * maxY;
+
+            // Aseguramos que la posición sea relativa a la tarjeta
+            btn.style.position = 'absolute';
+            btn.style.left = `${x + margin/2}px`;
+            btn.style.top = `${y + margin/2}px`;
+        }
+
+        function acceptProposal() {
+            document.getElementById('question-screen').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'block';
+            // Opcional: lanza confeti aquí
+        }
+
+        // --- Script para generar los corazones del fondo ---
+        function createHeart() {
+            const heart = document.createElement("div");
+            heart.classList.add("heart");
+            heart.style.width = `${Math.random() * 30 + 10}px`;
+            heart.style.height = heart.style.width;
+            heart.style.left = `${Math.random() * 100}%`;
+            heart.style.background = `rgba(255, 192, 203, ${Math.random() * 0.5 + 0.2})`; // Rosado semitransparente
+            heart.style.animation = `love ${Math.random() * 5 + 5}s linear infinite`;
+            
+            document.querySelector(".bg_heart").appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 10000);
+        }
+
+        // Generar un corazón cada 400ms
+        setInterval(createHeart, 400);
+    </script>
+</body>
+</html>
